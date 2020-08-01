@@ -1,0 +1,127 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+int N,R;
+
+struct person {
+    int personID;
+    struct person * next;
+};
+
+struct room{
+    int maxsize;
+    struct person * ptr;
+    int count;
+};
+
+
+int  search(int personID,int x,struct room ** a,int k,int q){
+    int flag=-1;
+    if(q==R){
+        flag=-1;
+        if(k==1)printf("-1\n");
+        return flag;
+    }
+    struct person * temp=a[x]->ptr;
+    if(temp==NULL){flag=-1;if(k==1)printf("-1\n");return -1;}
+    else {
+        while (temp){
+            if(temp->personID==personID){
+               struct person * temp2=a[x]->ptr;
+                while(temp2){
+                    if(k==1)printf("%d ",temp2->personID);
+                    temp2=temp2->next;
+                }
+                if(k==1)printf("\n");
+                flag=x;
+                return flag;
+            }
+            else temp=temp->next;
+        }
+        if(flag==-1){
+            if(a[x]->count<a[x]->maxsize){
+                if(k==1)
+                printf("-1\n");
+                flag=-1;
+                return -1;
+            }
+            else {
+                x=x+1;q=q+1;
+                x=x%R;
+                 return search(personID,x,a,k,q);
+
+            }
+        }
+    }
+    return flag;
+}
+
+void insert(int personID,int x,int y,struct room * * a){
+  //  printf("%d ",y);
+    if(y==R){
+        printf("-1\n");
+        return;
+    }
+  
+    else{
+        if(a[x]->count<a[x]->maxsize){
+            struct person * temp=a[x]->ptr;
+            struct person * ptr=(struct person*)malloc(sizeof(struct person));
+            ptr->personID=personID;
+            ptr->next=NULL;
+            if(temp==NULL){
+                temp=ptr;
+                a[x]->ptr=ptr;
+                a[x]->count++;
+                return;
+            }
+            else{
+                while (temp->next){
+                    temp=temp->next;
+                }
+                temp->next=ptr;
+                a[x]->count++;
+                return;
+            }
+        }
+        else {
+           if(y+1==R){printf("-1\n");return;}
+            x=(x+1)%R;
+            insert(personID,x,y+1,a);
+            return;
+        }
+    }
+}
+
+int main() {
+    int k,e,f;
+    scanf("%d",&N);
+    scanf("%d",&R);
+    struct room * a[R];
+    for(int i=0;i<R;i++){
+        scanf("%d",&k);
+        a[i]=(struct room *)malloc(sizeof(struct room));
+        a[i]->maxsize = k;
+        a[i]->ptr=NULL;
+        a[i]->count=0;
+    }
+    for(int j=0;j<N;j++){
+        scanf("%d",&e);
+        scanf("%d",&f);
+         int x=f%R;
+        if(e==1){
+            int q=search(f,x,a,0,0);
+            if(q==-1)
+            insert(f,x,0,a);
+            else printf("-1\n");
+        }
+        else {
+            search(f,x,a,1,0);
+        }
+    }
+        
+
+    /* Enter your code here. Read input from STDIN. Print output to STDOUT */    
+    return 0;
+}
